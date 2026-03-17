@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tunnel Collapse Prediction System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+background:#0f172a;
+color:white;
+margin:0;
+padding:0;
+}
+
+header{
+background:#020617;
+padding:20px;
+text-align:center;
+border-bottom:2px solid #334155;
+}
+
+h1{
+margin:0;
+}
+
+.dashboard{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 0 10px rgba(0,0,0,0.5);
+}
+
+.value{
+font-size:28px;
+margin-top:10px;
+}
+
+.status{
+text-align:center;
+padding:20px;
+font-size:22px;
+}
+
+.safe{color:#22c55e}
+.warning{color:#f59e0b}
+.danger{color:#ef4444}
+
+.alert{
+background:#7f1d1d;
+padding:15px;
+margin:20px;
+display:none;
+border-radius:8px;
+text-align:center;
+}
+
+.charts{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
+gap:20px;
+padding:20px;
+}
+
+canvas{
+background:#1e293b;
+padding:10px;
+border-radius:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>AI Tunnel Collapse Prediction System</h1>
+<p>Smart Underground Safety Monitoring Dashboard</p>
+</header>
+
+<div class="dashboard">
+
+<div class="card">
+Ground Vibration
+<div class="value" id="vibration">0</div>
+</div>
+
+<div class="card">
+Rock Pressure
+<div class="value" id="pressure">0</div>
+</div>
+
+<div class="card">
+Crack Width
+<div class="value" id="crack">0</div>
+</div>
+
+<div class="card">
+Water Seepage
+<div class="value" id="water">0</div>
+</div>
+
+<div class="card">
+Gas Level
+<div class="value" id="gas">0</div>
+</div>
+
+<div class="card">
+Temperature
+<div class="value" id="temp">0</div>
+</div>
+
+</div>
+
+<div class="status">
+Tunnel Status: <span id="statusText" class="safe">SAFE</span>
+<br>
+Collapse Probability: <span id="probability">10%</span>
+</div>
+
+<div class="alert" id="alertBox">
+⚠ Structural instability detected – Possible Tunnel Collapse!
+</div>
+
+<div class="charts">
+
+<canvas id="vibrationChart"></canvas>
+<canvas id="pressureChart"></canvas>
+
+</div>
+
+<script>
+
+let vibData=[]
+let pressData=[]
+let labels=[]
+
+const vibChart=new Chart(document.getElementById("vibrationChart"),{
+type:"line",
+data:{
+labels:labels,
+datasets:[{
+label:"Vibration",
+data:vibData
+}]
+}
+})
+
+const pressChart=new Chart(document.getElementById("pressureChart"),{
+type:"line",
+data:{
+labels:labels,
+datasets:[{
+label:"Rock Pressure",
+data:pressData
+}]
+}
+})
+
+function generateData(){
+
+let vibration=(Math.random()*1).toFixed(2)
+let pressure=(100+Math.random()*80).toFixed(0)
+let crack=(Math.random()*6).toFixed(2)
+let water=Math.random()>0.7?"High":"Normal"
+let gas=(200+Math.random()*400).toFixed(0)
+let temp=(25+Math.random()*15).toFixed(0)
+
+document.getElementById("vibration").innerText=vibration+" mm/s"
+document.getElementById("pressure").innerText=pressure+" kPa"
+document.getElementById("crack").innerText=crack+" mm"
+document.getElementById("water").innerText=water
+document.getElementById("gas").innerText=gas+" ppm"
+document.getElementById("temp").innerText=temp+" °C"
+
+predict(vibration,pressure,crack,water)
+
+labels.push("")
+vibData.push(vibration)
+pressData.push(pressure)
+
+if(labels.length>10){
+labels.shift()
+vibData.shift()
+pressData.shift()
+}
+
+vibChart.update()
+pressChart.update()
+
+}
+
+function predict(vibration,pressure,crack,water){
+
+let status="SAFE"
+let prob=10
+
+if(vibration>0.7 && crack>4){
+status="COLLAPSE RISK"
+prob=85
+}
+
+else if(pressure>150 || water==="High"){
+status="WARNING"
+prob=60
+}
+
+let statusText=document.getElementById("statusText")
+statusText.innerText=status
+document.getElementById("probability").innerText=prob+"%"
+
+statusText.className=""
+
+if(status==="SAFE") statusText.classList.add("safe")
+if(status==="WARNING") statusText.classList.add("warning")
+if(status==="COLLAPSE RISK") statusText.classList.add("danger")
+
+let alertBox=document.getElementById("alertBox")
+
+if(status==="COLLAPSE RISK"){
+alertBox.style.display="block"
+}else{
+alertBox.style.display="none"
+}
+
+}
+
+setInterval(generateData,3000)
+
+</script>
+
+</body>
+</html>
