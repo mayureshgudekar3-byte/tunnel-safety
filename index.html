@@ -4,9 +4,8 @@
 <title>AI Tunnel Safety System</title>
 
 <style>
-
 body{
-font-family: Arial;
+font-family:Arial;
 background:#0f172a;
 color:white;
 text-align:center;
@@ -16,45 +15,41 @@ h1{
 color:#38bdf8;
 }
 
-.dashboard{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:20px;
-padding:20px;
-}
-
-.card{
+.container{
+width:70%;
+margin:auto;
 background:#1e293b;
-padding:20px;
+padding:30px;
 border-radius:10px;
 }
 
-.tunnel{
-width:80%;
-height:120px;
-background:#374151;
-margin:auto;
-border-radius:60px;
-position:relative;
+button{
+padding:10px 20px;
+background:#38bdf8;
+border:none;
+cursor:pointer;
+margin-top:15px;
 }
 
-.sensor{
-width:20px;
-height:20px;
-background:red;
-border-radius:50%;
-position:absolute;
-top:50px;
+.result{
+font-size:22px;
+margin-top:20px;
 }
-
-.s1{left:15%;}
-.s2{left:40%;}
-.s3{left:65%;}
 
 .safe{color:lightgreen;}
 .warning{color:orange;}
 .danger{color:red;}
 
+table{
+margin:auto;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+td,th{
+padding:8px;
+border:1px solid gray;
+}
 </style>
 </head>
 
@@ -63,73 +58,77 @@ top:50px;
 <h1>AI Driven Smart Tunneling and Underground Safety System</h1>
 <h2>Tunnel Collapse Prediction Dashboard</h2>
 
-<div class="tunnel">
-<div class="sensor s1"></div>
-<div class="sensor s2"></div>
-<div class="sensor s3"></div>
-</div>
+<div class="container">
 
-<div class="dashboard">
+<button onclick="loadData()">Load Tunnel Data</button>
 
-<div class="card">
-<h3>Ground Vibration</h3>
-<p id="vibration">2.1 mm/s</p>
-</div>
+<table>
+<tr>
+<th>Vibration</th>
+<th>Pressure</th>
+<th>Gas</th>
+<th>Water</th>
+<th>Displacement</th>
+</tr>
 
-<div class="card">
-<h3>Rock Pressure</h3>
-<p id="pressure">160 kPa</p>
-</div>
+<tr>
+<td id="v"></td>
+<td id="p"></td>
+<td id="g"></td>
+<td id="w"></td>
+<td id="d"></td>
+</tr>
+</table>
 
-<div class="card">
-<h3>Methane Gas</h3>
-<p id="gas">1.2%</p>
-</div>
-
-<div class="card">
-<h3>Water Seepage</h3>
-<p id="water">Low</p>
-</div>
-
-<div class="card">
-<h3>AI Prediction</h3>
-<p id="status" class="safe">SAFE</p>
-</div>
+<p id="score"></p>
+<p id="result" class="result"></p>
 
 </div>
 
 <script>
 
-function predict(){
+async function loadData(){
 
-let vibration=Math.random()*5;
-let pressure=150+Math.random()*100;
-let gas=Math.random()*3;
+let response = await fetch("tunnel_data.csv");
+let text = await response.text();
 
-document.getElementById("vibration").innerHTML=vibration.toFixed(2)+" mm/s";
-document.getElementById("pressure").innerHTML=pressure.toFixed(0)+" kPa";
-document.getElementById("gas").innerHTML=gas.toFixed(2)+" %";
+let rows = text.split("\n").slice(1);
+let randomRow = rows[Math.floor(Math.random()*rows.length)];
 
-let risk=(vibration*10)+(gas*20)+(pressure/10);
+let data = randomRow.split(",");
 
-let status=document.getElementById("status");
+let vibration = Number(data[0]);
+let pressure = Number(data[1]);
+let gas = Number(data[2]);
+let water = Number(data[3]);
+let displacement = Number(data[4]);
 
-if(risk<50){
-status.innerHTML="SAFE";
-status.className="safe";
+document.getElementById("v").innerHTML = vibration;
+document.getElementById("p").innerHTML = pressure;
+document.getElementById("g").innerHTML = gas;
+document.getElementById("w").innerHTML = water;
+document.getElementById("d").innerHTML = displacement;
+
+let risk = (vibration*10) + (pressure/5) + (gas*20) + (water*5) + (displacement*15);
+
+document.getElementById("score").innerHTML = "Risk Score: " + risk.toFixed(2);
+
+let result = document.getElementById("result");
+
+if(risk < 50){
+result.innerHTML="Tunnel Status: SAFE";
+result.className="result safe";
 }
-else if(risk<80){
-status.innerHTML="WARNING";
-status.className="warning";
+else if(risk < 80){
+result.innerHTML="Tunnel Status: WARNING – Monitor Conditions";
+result.className="result warning";
 }
 else{
-status.innerHTML="HIGH COLLAPSE RISK";
-status.className="danger";
+result.innerHTML="Tunnel Status: HIGH COLLAPSE RISK";
+result.className="result danger";
 }
 
 }
-
-setInterval(predict,3000);
 
 </script>
 
